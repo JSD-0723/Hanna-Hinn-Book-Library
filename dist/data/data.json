@@ -1,0 +1,5 @@
+[
+    { "name": "Algorithms", "author": "Author 1", "isbn": "123456" },
+    { "name": "Data Structures", "author": "Author 2", "isbn": "234567" },
+    { "name": "Programming", "author": "Author 3", "isbn": "345678" }
+  ]
