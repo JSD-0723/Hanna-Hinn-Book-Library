@@ -17,10 +17,11 @@ const getBooksFromFile = (cb) => {
     });
 };
 class Book {
-    constructor(name, author, isbn) {
+    constructor(name, author, isbn, rented = false) {
         this.name = name;
         this.author = author;
         this.isbn = isbn;
+        this.rented = rented;
     }
     save() {
         getBooksFromFile((books) => {

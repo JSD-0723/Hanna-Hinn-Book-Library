@@ -9,6 +9,32 @@ export function getBooks(req: Request, res: Response) {
   });
 }
 
+// POST /rent --> Rent a Book
+export function rentBook(req: Request, res: Response) {
+  try {
+    const bookName: string = req.body.name;
+    if (!bookName) {
+      throw new Error("Book name missing for rent");
+    }
+    Book.fetchAll((books) => {
+      let foundBook = false;
+      books.forEach((book) => {
+        if (book.name.toLowerCase() === bookName.toLowerCase()) {
+          book.rented = true;
+          foundBook = true;
+        }
+      });
+      if (foundBook) {
+        res.status(200).send("Book Rented Successfully");
+      } else {
+        res.status(404).send("Desired book not found");
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
 // GET /search?search="str" --> Get books that match the search
 export function searchBooks(req: Request, res: Response) {
   try {

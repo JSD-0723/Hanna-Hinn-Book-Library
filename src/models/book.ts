@@ -21,11 +21,18 @@ class Book {
   name: string;
   author: string;
   isbn: number;
+  rented: boolean;
 
-  constructor(name: string, author: string, isbn: number) {
+  constructor(
+    name: string,
+    author: string,
+    isbn: number,
+    rented: boolean = false
+  ) {
     this.name = name;
     this.author = author;
     this.isbn = isbn;
+    this.rented = rented;
   }
 
   save() {

@@ -8,7 +8,7 @@ const body_parser_1 = __importDefault(require("body-parser"));
 const book_js_1 = __importDefault(require("./routes/book.js"));
 const error_js_1 = require("./controllers/error.js");
 const app = (0, express_1.default)();
-app.use(body_parser_1.default.urlencoded({ extended: false }));
+app.use(body_parser_1.default.urlencoded({ extended: true }));
 app.use(book_js_1.default);
 app.use(error_js_1.get404);
 app.use(error_js_1.errorHandler);

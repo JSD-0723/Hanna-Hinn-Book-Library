@@ -8,5 +8,6 @@ const books_js_1 = require("../controllers/books.js");
 const router = express_1.default.Router();
 router.get("/books", books_js_1.getBooks);
 router.get("/search", books_js_1.searchBooks);
+router.post("/rent-book", books_js_1.rentBook);
 exports.default = router;
 //# sourceMappingURL=book.js.map
