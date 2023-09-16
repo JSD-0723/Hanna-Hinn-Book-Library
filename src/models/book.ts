@@ -7,7 +7,7 @@ const filePath: string = path.join(
   "data.json"
 );
 
-const getBooksFromFile = (cb) => {
+const getBooksFromFile = (cb: { (books: Book[]): void }): void => {
   fs.readFile(filePath, (error, data) => {
     if (error) {
       cb([]);
@@ -36,15 +36,15 @@ class Book {
   }
 
   save() {
-    getBooksFromFile((books) => {
+    getBooksFromFile((books: Book[]) => {
       books.push(this);
-      fs.writeFile(filePath, JSON.stringify(books), (err) => {
+      fs.writeFile(filePath, JSON.stringify(books), (err: Error) => {
         console.log(err);
       });
     });
   }
 
-  static fetchAll(cb) {
+  static fetchAll(cb: { (books: Book[]): void }) {
     getBooksFromFile(cb);
   }
 }

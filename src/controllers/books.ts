@@ -9,7 +9,7 @@ export function getBooks(req: Request, res: Response) {
   });
 }
 
-// POST /rent --> Rent a Book
+// POST /rent-book --> Rent a Book
 export function rentBook(req: Request, res: Response) {
   try {
     const bookName: string = req.body.name;
@@ -17,8 +17,8 @@ export function rentBook(req: Request, res: Response) {
       throw new Error("Book name missing for rent");
     }
     Book.fetchAll((books) => {
-      let foundBook = false;
-      books.forEach((book) => {
+      let foundBook: boolean = false;
+      books.forEach((book: Book) => {
         if (book.name.toLowerCase() === bookName.toLowerCase()) {
           book.rented = true;
           foundBook = true;
@@ -42,8 +42,8 @@ export function searchBooks(req: Request, res: Response) {
     if (!searchQuery) {
       throw new Error("Search query is missing");
     }
-    Book.fetchAll((books) => {
-      const filteredBooks: [] = books.filter((book) => {
+    Book.fetchAll((books: Book[]) => {
+      const filteredBooks: Book[] = books.filter((book: Book) => {
         return book.name.toLowerCase().includes(searchQuery.toLowerCase());
       });
       res.json(filteredBooks);
