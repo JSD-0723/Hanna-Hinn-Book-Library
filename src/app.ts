@@ -3,7 +3,8 @@ import bodyParser from "body-parser";
 
 import bookRoutes from "./routes/book.js";
 import sequelize from "./util/database";
-import { get404, errorHandler } from "./controllers/error.js";
+import { get404 } from "./controllers/error.js";
+import { errorMiddleware } from "./middlewares/errorMiddleware.js";
 
 const app: Express = express();
 
@@ -13,7 +14,7 @@ app.use("/books", bookRoutes);
 
 app.use(get404);
 
-app.use(errorHandler);
+app.use(errorMiddleware);
 
 sequelize
   .sync()

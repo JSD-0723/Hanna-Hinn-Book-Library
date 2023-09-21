@@ -22,6 +22,7 @@ const Book = database_1.default.define("book", {
     },
     isbn: {
         type: sequelize_1.default.INTEGER,
+        unique: true,
         allowNull: false,
     },
 });
