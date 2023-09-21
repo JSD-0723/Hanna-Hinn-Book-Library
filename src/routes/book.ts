@@ -1,13 +1,27 @@
 import express, { Express } from "express";
 
-import { getBooks, searchBooks, rentBook } from "../controllers/books.js";
+import {
+  getIndex,
+  getBook,
+  putUpdateBook,
+  postIndex,
+  deleteBook,
+} from "../controllers/books.js";
 
 const router: Express = express.Router();
 
-router.get("/books", getBooks);
+router.get("", getIndex);
 
-router.get("/search", searchBooks);
+router.post("", postIndex);
 
-router.post("/rent-book", rentBook);
+router.get("/:bookId", getBook);
+
+router.put("/:bookId", putUpdateBook);
+
+router.delete("/:bookId", deleteBook);
+
+// router.get(searchBooks);
+
+// router.post(rentBook);
 
 export default router;

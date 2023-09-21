@@ -6,8 +6,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const books_js_1 = require("../controllers/books.js");
 const router = express_1.default.Router();
-router.get("/books", books_js_1.getBooks);
-router.get("/search", books_js_1.searchBooks);
-router.post("/rent-book", books_js_1.rentBook);
+router.get("", books_js_1.getIndex);
+router.post("", books_js_1.postIndex);
+router.get("/:bookId", books_js_1.getBook);
+router.put("/:bookId", books_js_1.putUpdateBook);
+router.delete("/:bookId", books_js_1.deleteBook);
+// router.get(searchBooks);
+// router.post(rentBook);
 exports.default = router;
 //# sourceMappingURL=book.js.map
