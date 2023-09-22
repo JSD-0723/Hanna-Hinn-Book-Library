@@ -75,10 +75,20 @@ function putUpdateBook(req, res) {
     if (checkError) {
         return res.status(422).json(checkError);
     }
-    book_js_1.default.update(updatedBook, { where: { id: bookId } })
-        .then(() => {
-        console.log("Successfully updated Book!");
-        res.status(200).json({ message: "Book updated successfully" });
+    if (!updatedBook || Object.keys(req.body).length == 0) {
+        return res.status(422).json({ message: "Request Body is not Valid" });
+    }
+    book_js_1.default.findByPk(bookId)
+        .then((book) => {
+        if (!book) {
+            return res.status(404).json({ message: "Book not found!" });
+        }
+        else {
+            book_js_1.default.update(updatedBook, { where: { id: bookId } }).then(() => {
+                console.log("Successfully updated Book!");
+                res.status(200).json({ message: "Book updated successfully" });
+            });
+        }
     })
         .catch((error) => {
         res.status(500).json({ error: error.message || "Error updating Book!" });

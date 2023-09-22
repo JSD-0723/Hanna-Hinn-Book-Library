@@ -3,6 +3,7 @@ import express, { Express } from "express";
 import {
   checkBookData,
   checkBookId,
+  checkPutBookData,
 } from "../middlewares/bookValidationMiddlewares.js";
 
 import {
@@ -21,7 +22,8 @@ router.post("", checkBookData, postIndex);
 
 router.get("/:bookId", checkBookId, getBook);
 
-router.put("/:bookId", checkBookId, putUpdateBook);
+// Put method validations ☹️
+router.put("/:bookId", checkBookId, checkPutBookData, putUpdateBook);
 
 router.delete("/:bookId", checkBookId, deleteBook);
 
