@@ -4,7 +4,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteBook = exports.putUpdateBook = exports.getBook = exports.postIndex = exports.getIndex = void 0;
+const express_validator_1 = require("express-validator");
 const book_js_1 = __importDefault(require("../models/book.js"));
+const checkValidationError_js_1 = __importDefault(require("../util/checkValidationError.js"));
 // GET /books --> Get All books
 function getIndex(req, res) {
     book_js_1.default.findAll()
@@ -12,7 +14,9 @@ function getIndex(req, res) {
         res.status(200).json({ message: "Operation Success", data: books });
     })
         .catch((error) => {
-        res.status(500).json({ error: error.message });
+        res
+            .status(500)
+            .json({ error: error.message || "Error Fetching All Books" });
     });
 }
 exports.getIndex = getIndex;
@@ -21,6 +25,11 @@ function postIndex(req, res) {
     const name = req.body.name;
     const author = req.body.author;
     const isbn = req.body.isbn;
+    const errors = (0, express_validator_1.validationResult)(req);
+    const checkError = (0, checkValidationError_js_1.default)(errors);
+    if (checkError) {
+        return res.status(422).json(checkError);
+    }
     book_js_1.default.create({
         name: name,
         author: author,
@@ -31,13 +40,18 @@ function postIndex(req, res) {
         res.status(201).json({ message: "Book added successfully" });
     })
         .catch((error) => {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error.message || "Error creating Book!" });
     });
 }
 exports.postIndex = postIndex;
 // GET /books/:bookId --> Get a book by id
 function getBook(req, res) {
     const bookId = req.params.bookId;
+    const errors = (0, express_validator_1.validationResult)(req);
+    const checkError = (0, checkValidationError_js_1.default)(errors);
+    if (checkError) {
+        return res.status(422).json(checkError);
+    }
     book_js_1.default.findByPk(bookId)
         .then((book) => {
         if (book) {
@@ -48,37 +62,41 @@ function getBook(req, res) {
         }
     })
         .catch((error) => {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error.message || "Error Fetching Book" });
     });
 }
 exports.getBook = getBook;
 // PUT /books/:bookId --> Update Book by id
 function putUpdateBook(req, res) {
+    const updatedBook = req.body;
     const bookId = req.params.bookId;
-    const updatedName = req.body.name;
-    const updatedAuthor = req.body.author;
-    const updatedIsbn = req.body.isbn;
-    book_js_1.default.findByPk(bookId)
-        .then((book) => {
-        book.name = updatedName;
-        book.author = updatedAuthor;
-        book.isbn = updatedIsbn;
-        return book.save();
-    })
+    const errors = (0, express_validator_1.validationResult)(req);
+    const checkError = (0, checkValidationError_js_1.default)(errors);
+    if (checkError) {
+        return res.status(422).json(checkError);
+    }
+    book_js_1.default.update(updatedBook, { where: { id: bookId } })
         .then(() => {
         console.log("Successfully updated Book!");
         res.status(200).json({ message: "Book updated successfully" });
     })
         .catch((error) => {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error.message || "Error updating Book!" });
     });
 }
 exports.putUpdateBook = putUpdateBook;
 // DELETE /books/:bookId --> Delete Book by id
 function deleteBook(req, res) {
     const bookId = req.params.bookId;
+    const errors = (0, express_validator_1.validationResult)(req);
+    const checkError = (0, checkValidationError_js_1.default)(errors);
+    if (checkError) {
+        return res.status(422).json(checkError);
+    }
     book_js_1.default.findByPk(bookId)
         .then((book) => {
+        if (!book)
+            return res.status(404).json({ message: "Book not found!" });
         return book.destroy();
     })
         .then(() => {
@@ -86,7 +104,9 @@ function deleteBook(req, res) {
         return res.status(200).json({ message: "Book Deleted successfully" });
     })
         .catch((error) => {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({
+            error: error.message || "Error Occurred While Deleting Book!",
+        });
     });
 }
 exports.deleteBook = deleteBook;

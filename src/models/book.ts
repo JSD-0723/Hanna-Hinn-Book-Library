@@ -23,4 +23,13 @@ const Book = sequelize.define("book", {
   },
 });
 
+// ??????????????? (Search about it)
+// Check if we can change it to interface or something else
+export type TBook = {
+  id: Number;
+  name: string;
+  author: string;
+  isbn: number;
+};
+
 export default Book;

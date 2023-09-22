@@ -1,15 +1,19 @@
 import { Request, Response } from "express";
+import { validationResult, Result, ValidationError } from "express-validator";
 
-import Book from "../models/book.js";
+import Book, { TBook } from "../models/book.js";
+import checkValidationResult from "../util/checkValidationError.js";
 
 // GET /books --> Get All books
 export function getIndex(req: Request, res: Response) {
   Book.findAll()
-    .then((books) => {
+    .then((books: Array<TBook>) => {
       res.status(200).json({ message: "Operation Success", data: books });
     })
-    .catch((error) => {
-      res.status(500).json({ error: error.message });
+    .catch((error: Error) => {
+      res
+        .status(500)
+        .json({ error: error.message || "Error Fetching All Books" });
     });
 }
 
@@ -18,6 +22,12 @@ export function postIndex(req: Request, res: Response) {
   const name: String = req.body.name;
   const author: String = req.body.author;
   const isbn: Number = req.body.isbn;
+  const errors: Result<ValidationError> = validationResult(req);
+  const checkError = checkValidationResult(errors);
+
+  if (checkError) {
+    return res.status(422).json(checkError);
+  }
 
   Book.create({
     name: name,
@@ -28,62 +38,79 @@ export function postIndex(req: Request, res: Response) {
       console.log("Successfully Added Book!");
       res.status(201).json({ message: "Book added successfully" });
     })
-    .catch((error) => {
-      res.status(500).json({ error: error.message });
+    .catch((error: Error) => {
+      res.status(500).json({ error: error.message || "Error creating Book!" });
     });
 }
 
 // GET /books/:bookId --> Get a book by id
 export function getBook(req: Request, res: Response) {
   const bookId: Number = req.params.bookId;
+  const errors: Result<ValidationError> = validationResult(req);
+  const checkError = checkValidationResult(errors);
+
+  if (checkError) {
+    return res.status(422).json(checkError);
+  }
+
   Book.findByPk(bookId)
-    .then((book) => {
+    .then((book: TBook) => {
       if (book) {
         res.status(200).json({ message: "Operation Success", data: book });
       } else {
         res.status(404).json({ message: "Book not found" });
       }
     })
-    .catch((error) => {
-      res.status(500).json({ error: error.message });
+    .catch((error: Error) => {
+      res.status(500).json({ error: error.message || "Error Fetching Book" });
     });
 }
 
 // PUT /books/:bookId --> Update Book by id
 export function putUpdateBook(req: Request, res: Response) {
+  const updatedBook: TBook = req.body;
   const bookId: Number = req.params.bookId;
-  const updatedName: String = req.body.name;
-  const updatedAuthor: String = req.body.author;
-  const updatedIsbn: Number = req.body.isbn;
-  Book.findByPk(bookId)
-    .then((book) => {
-      book.name = updatedName;
-      book.author = updatedAuthor;
-      book.isbn = updatedIsbn;
-      return book.save();
-    })
+  const errors: Result<ValidationError> = validationResult(req);
+  const checkError = checkValidationResult(errors);
+
+  if (checkError) {
+    return res.status(422).json(checkError);
+  }
+
+  Book.update(updatedBook, { where: { id: bookId } })
     .then(() => {
       console.log("Successfully updated Book!");
       res.status(200).json({ message: "Book updated successfully" });
     })
-    .catch((error) => {
-      res.status(500).json({ error: error.message });
+    .catch((error: Error) => {
+      res.status(500).json({ error: error.message || "Error updating Book!" });
     });
 }
 
 // DELETE /books/:bookId --> Delete Book by id
 export function deleteBook(req: Request, res: Response) {
   const bookId: Number = req.params.bookId;
+
+  const errors: Result<ValidationError> = validationResult(req);
+  const checkError = checkValidationResult(errors);
+
+  if (checkError) {
+    return res.status(422).json(checkError);
+  }
+
   Book.findByPk(bookId)
     .then((book) => {
+      if (!book) return res.status(404).json({ message: "Book not found!" });
       return book.destroy();
     })
     .then(() => {
       console.log("Delete product successfully");
       return res.status(200).json({ message: "Book Deleted successfully" });
     })
-    .catch((error) => {
-      res.status(500).json({ error: error.message });
+    .catch((error: Error) => {
+      res.status(500).json({
+        error: error.message || "Error Occurred While Deleting Book!",
+      });
     });
 }
 

@@ -5,16 +5,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const body_parser_1 = __importDefault(require("body-parser"));
-const book_js_1 = __importDefault(require("./routes/book.js"));
-const database_1 = __importDefault(require("./util/database"));
+const book_routes_js_1 = __importDefault(require("./routes/book.routes.js"));
+const database_js_1 = __importDefault(require("./util/database.js"));
 const error_js_1 = require("./controllers/error.js");
 const errorMiddleware_js_1 = require("./middlewares/errorMiddleware.js");
 const app = (0, express_1.default)();
 app.use(body_parser_1.default.urlencoded({ extended: true }));
-app.use("/books", book_js_1.default);
+app.use("/books", book_routes_js_1.default);
 app.use(error_js_1.get404);
 app.use(errorMiddleware_js_1.errorMiddleware);
-database_1.default
+database_js_1.default
     .sync()
     .then(() => {
     app.listen(3000);

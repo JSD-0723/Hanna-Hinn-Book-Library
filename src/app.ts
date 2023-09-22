@@ -1,8 +1,8 @@
 import express, { Express } from "express";
 import bodyParser from "body-parser";
 
-import bookRoutes from "./routes/book.js";
-import sequelize from "./util/database";
+import bookRoutes from "./routes/book.routes.js";
+import sequelize from "./util/database.js";
 import { get404 } from "./controllers/error.js";
 import { errorMiddleware } from "./middlewares/errorMiddleware.js";
 
