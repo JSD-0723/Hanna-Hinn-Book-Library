@@ -8,7 +8,7 @@ import checkValidationResult from "../util/checkValidationError.js";
 export function getIndex(req: Request, res: Response) {
   Book.findAll()
     .then((books: Array<TBook>) => {
-      console.log("Successfully retrieved All books:", books);
+      console.log("Successfully retrieved All books");
       res.status(200).json({ message: "Operation Success", data: books });
     })
     .catch((error: Error) => {
@@ -36,8 +36,8 @@ export function postIndex(req: Request, res: Response) {
     author: author,
     isbn: isbn,
   })
-    .then((result) => {
-      console.log("Successfully Added Book:", result);
+    .then(() => {
+      console.log("Successfully Added Book:");
       res.status(201).json({ message: "Book added successfully" });
     })
     .catch((error: Error) => {
@@ -59,7 +59,7 @@ export function getBook(req: Request, res: Response) {
   Book.findByPk(bookId)
     .then((book: TBook) => {
       if (book) {
-        console.log("Successfully Fetched Book: ", book);
+        console.log("Successfully Fetched Book");
         res.status(200).json({ message: "Operation Success", data: book });
       } else {
         console.log("Requested Book Does not Exists: ", book);
@@ -91,11 +91,11 @@ export function putUpdateBook(req: Request, res: Response) {
   Book.findByPk(bookId)
     .then((book) => {
       if (!book) {
-        console.log("Request Book does not exists: ", book);
+        console.log("Request Book does not exists");
         return res.status(404).json({ message: "Book not found!" });
       } else {
         Book.update(updatedBook, { where: { id: bookId } }).then(() => {
-          console.log("Successfully updated Book!", book);
+          console.log("Successfully updated Book!");
           res.status(200).json({ message: "Book updated successfully" });
         });
       }
@@ -120,13 +120,13 @@ export function deleteBook(req: Request, res: Response) {
   Book.findByPk(bookId)
     .then((book) => {
       if (!book) {
-        console.log("Requested Book does not exists: ", book);
+        console.log("Requested Book does not exists: ");
         return res.status(404).json({ message: "Book not found!" });
       }
       return book.destroy();
     })
     .then((result) => {
-      console.log("Delete product successfully", result);
+      console.log("Delete product successfully");
       return res.status(200).json({ message: "Book Deleted successfully" });
     })
     .catch((error: Error) => {
