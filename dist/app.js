@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const body_parser_1 = __importDefault(require("body-parser"));
+const server_config_js_1 = __importDefault(require("./config/server.config.js"));
 const book_routes_js_1 = __importDefault(require("./routes/book.routes.js"));
 const database_js_1 = __importDefault(require("./util/database.js"));
 const error_js_1 = require("./controllers/error.js");
@@ -22,7 +23,8 @@ app.use(errorMiddleware_js_1.errorMiddleware);
 database_js_1.default
     .sync()
     .then(() => {
-    app.listen(3000);
+    app.listen(server_config_js_1.default.PORT, server_config_js_1.default.HOST);
+    console.log(`Server Listening on ${server_config_js_1.default.HOST}:${server_config_js_1.default.PORT}`);
 })
     .catch((err) => {
     console.log(err);

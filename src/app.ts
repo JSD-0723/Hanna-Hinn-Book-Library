@@ -1,6 +1,8 @@
 import express, { Express } from "express";
 import bodyParser from "body-parser";
 
+import serverConfig from "./config/server.config.js";
+
 import bookRoutes from "./routes/book.routes.js";
 import sequelize from "./util/database.js";
 import { get404 } from "./controllers/error.js";
@@ -21,11 +23,13 @@ app.use(get404);
 // Error handling middleware
 app.use(errorMiddleware);
 
-
 sequelize
   .sync()
   .then(() => {
-    app.listen(3000);
+    app.listen(serverConfig.PORT, serverConfig.HOST);
+    console.log(
+      `Server Listening on ${serverConfig.HOST}:${serverConfig.PORT}`
+    );
   })
   .catch((err) => {
     console.log(err);

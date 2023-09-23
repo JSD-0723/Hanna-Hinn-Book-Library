@@ -11,9 +11,11 @@ const checkValidationError_js_1 = __importDefault(require("../util/checkValidati
 function getIndex(req, res) {
     book_js_1.default.findAll()
         .then((books) => {
+        console.log("Successfully retrieved All books:", books);
         res.status(200).json({ message: "Operation Success", data: books });
     })
         .catch((error) => {
+        console.log("Error occurred when fetching books:", error.message);
         res
             .status(500)
             .json({ error: error.message || "Error Fetching All Books" });
@@ -35,11 +37,12 @@ function postIndex(req, res) {
         author: author,
         isbn: isbn,
     })
-        .then(() => {
-        console.log("Successfully Added Book!");
+        .then((result) => {
+        console.log("Successfully Added Book:", result);
         res.status(201).json({ message: "Book added successfully" });
     })
         .catch((error) => {
+        console.log("Error occurred when adding book:", error.message);
         res.status(500).json({ error: error.message || "Error creating Book!" });
     });
 }
@@ -55,13 +58,16 @@ function getBook(req, res) {
     book_js_1.default.findByPk(bookId)
         .then((book) => {
         if (book) {
+            console.log("Successfully Fetched Book: ", book);
             res.status(200).json({ message: "Operation Success", data: book });
         }
         else {
+            console.log("Requested Book Does not Exists: ", book);
             res.status(404).json({ message: "Book not found" });
         }
     })
         .catch((error) => {
+        console.log("Failure Fetching Book: ", error.message);
         res.status(500).json({ error: error.message || "Error Fetching Book" });
     });
 }
@@ -75,22 +81,25 @@ function putUpdateBook(req, res) {
     if (checkError) {
         return res.status(422).json(checkError);
     }
-    if (!updatedBook || Object.keys(req.body).length == 0) {
+    if (!updatedBook || Object.keys(req.body).length === 0) {
+        console.log("Request body is not Valid: ", updatedBook);
         return res.status(422).json({ message: "Request Body is not Valid" });
     }
     book_js_1.default.findByPk(bookId)
         .then((book) => {
         if (!book) {
+            console.log("Request Book does not exists: ", book);
             return res.status(404).json({ message: "Book not found!" });
         }
         else {
             book_js_1.default.update(updatedBook, { where: { id: bookId } }).then(() => {
-                console.log("Successfully updated Book!");
+                console.log("Successfully updated Book!", book);
                 res.status(200).json({ message: "Book updated successfully" });
             });
         }
     })
         .catch((error) => {
+        console.log("Failure Updating Book: ", error.message);
         res.status(500).json({ error: error.message || "Error updating Book!" });
     });
 }
@@ -105,12 +114,14 @@ function deleteBook(req, res) {
     }
     book_js_1.default.findByPk(bookId)
         .then((book) => {
-        if (!book)
+        if (!book) {
+            console.log("Requested Book does not exists: ", book);
             return res.status(404).json({ message: "Book not found!" });
+        }
         return book.destroy();
     })
-        .then(() => {
-        console.log("Delete product successfully");
+        .then((result) => {
+        console.log("Delete product successfully", result);
         return res.status(200).json({ message: "Book Deleted successfully" });
     })
         .catch((error) => {
@@ -157,11 +168,13 @@ function searchBooks(req, res) {
             const filteredBooks = books.filter((book) => {
                 return book.name.toLowerCase().includes(searchQuery.toLowerCase());
             });
+            console.log(`Successfully Searched ${searchQuery}: `, filteredBooks);
             res
                 .status(200)
                 .json({ message: "Operation Success", data: filteredBooks });
         })
             .catch((error) => {
+            console.log("Failure Searching Books: ", error.message);
             res
                 .status(500)
                 .json({ error: error.message || "Error Fetching All Books" });

@@ -9,5 +9,13 @@ const sequelize = new Sequelize(db_config_js_1.default.DB, db_config_js_1.defaul
     dialect: db_config_js_1.default.dialect,
     host: db_config_js_1.default.HOST,
 });
+sequelize
+    .authenticate()
+    .then(() => {
+    console.log("DB Connection has been established successfully.");
+})
+    .catch((err) => {
+    console.error("Unable to connect to the database:", err);
+});
 exports.default = sequelize;
 //# sourceMappingURL=database.js.map

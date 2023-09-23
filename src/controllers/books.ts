@@ -8,9 +8,11 @@ import checkValidationResult from "../util/checkValidationError.js";
 export function getIndex(req: Request, res: Response) {
   Book.findAll()
     .then((books: Array<TBook>) => {
+      console.log("Successfully retrieved All books:", books);
       res.status(200).json({ message: "Operation Success", data: books });
     })
     .catch((error: Error) => {
+      console.log("Error occurred when fetching books:", error.message);
       res
         .status(500)
         .json({ error: error.message || "Error Fetching All Books" });
@@ -34,11 +36,12 @@ export function postIndex(req: Request, res: Response) {
     author: author,
     isbn: isbn,
   })
-    .then(() => {
-      console.log("Successfully Added Book!");
+    .then((result) => {
+      console.log("Successfully Added Book:", result);
       res.status(201).json({ message: "Book added successfully" });
     })
     .catch((error: Error) => {
+      console.log("Error occurred when adding book:", error.message);
       res.status(500).json({ error: error.message || "Error creating Book!" });
     });
 }
@@ -56,12 +59,15 @@ export function getBook(req: Request, res: Response) {
   Book.findByPk(bookId)
     .then((book: TBook) => {
       if (book) {
+        console.log("Successfully Fetched Book: ", book);
         res.status(200).json({ message: "Operation Success", data: book });
       } else {
+        console.log("Requested Book Does not Exists: ", book);
         res.status(404).json({ message: "Book not found" });
       }
     })
     .catch((error: Error) => {
+      console.log("Failure Fetching Book: ", error.message);
       res.status(500).json({ error: error.message || "Error Fetching Book" });
     });
 }
@@ -77,22 +83,25 @@ export function putUpdateBook(req: Request, res: Response) {
     return res.status(422).json(checkError);
   }
 
-  if (!updatedBook || Object.keys(req.body).length == 0) {
+  if (!updatedBook || Object.keys(req.body).length === 0) {
+    console.log("Request body is not Valid: ", updatedBook);
     return res.status(422).json({ message: "Request Body is not Valid" });
   }
 
   Book.findByPk(bookId)
     .then((book) => {
       if (!book) {
+        console.log("Request Book does not exists: ", book);
         return res.status(404).json({ message: "Book not found!" });
       } else {
         Book.update(updatedBook, { where: { id: bookId } }).then(() => {
-          console.log("Successfully updated Book!");
+          console.log("Successfully updated Book!", book);
           res.status(200).json({ message: "Book updated successfully" });
         });
       }
     })
     .catch((error: Error) => {
+      console.log("Failure Updating Book: ", error.message);
       res.status(500).json({ error: error.message || "Error updating Book!" });
     });
 }
@@ -110,11 +119,14 @@ export function deleteBook(req: Request, res: Response) {
 
   Book.findByPk(bookId)
     .then((book) => {
-      if (!book) return res.status(404).json({ message: "Book not found!" });
+      if (!book) {
+        console.log("Requested Book does not exists: ", book);
+        return res.status(404).json({ message: "Book not found!" });
+      }
       return book.destroy();
     })
-    .then(() => {
-      console.log("Delete product successfully");
+    .then((result) => {
+      console.log("Delete product successfully", result);
       return res.status(200).json({ message: "Book Deleted successfully" });
     })
     .catch((error: Error) => {
@@ -162,11 +174,13 @@ export function searchBooks(req: Request, res: Response) {
         const filteredBooks = books.filter((book) => {
           return book.name.toLowerCase().includes(searchQuery.toLowerCase());
         });
+        console.log(`Successfully Searched ${searchQuery}: `, filteredBooks);
         res
           .status(200)
           .json({ message: "Operation Success", data: filteredBooks });
       })
       .catch((error: Error) => {
+        console.log("Failure Searching Books: ", error.message);
         res
           .status(500)
           .json({ error: error.message || "Error Fetching All Books" });
