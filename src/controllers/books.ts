@@ -151,19 +151,27 @@ export function deleteBook(req: Request, res: Response) {
 // }
 
 // GET /search?search="str" --> Get books that match the search
-// export function searchBooks(req: Request, res: Response) {
-//   try {
-//     const searchQuery: string = req.query.search;
-//     if (!searchQuery) {
-//       throw new Error("Search query is missing");
-//     }
-//     Book.fetchAll((books) => {
-//       const filteredBooks = books.filter((book) => {
-//         return book.name.toLowerCase().includes(searchQuery.toLowerCase());
-//       });
-//       res.json(filteredBooks);
-//     });
-//   } catch (error) {
-//     res.status(500).json({ error: error.message });
-//   }
-// }
+export function searchBooks(req: Request, res: Response) {
+  try {
+    const searchQuery: string = req.query.search;
+    if (!searchQuery) {
+      throw new Error("Search query is missing");
+    }
+    Book.findAll()
+      .then((books: Array<TBook>) => {
+        const filteredBooks = books.filter((book) => {
+          return book.name.toLowerCase().includes(searchQuery.toLowerCase());
+        });
+        res
+          .status(200)
+          .json({ message: "Operation Success", data: filteredBooks });
+      })
+      .catch((error: Error) => {
+        res
+          .status(500)
+          .json({ error: error.message || "Error Fetching All Books" });
+      });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}

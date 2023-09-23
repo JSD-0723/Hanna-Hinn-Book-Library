@@ -20,9 +20,3 @@ export const checkPutBookData = [
     .notEmpty(),
   body("isbn", "Please enter a valid isbn number.").optional().isNumeric(),
 ];
-
-/* 
-  ToDo: Add a custom validation middleware for the req.body for 
-  when the request body is empty when we have optional values 
-  like in the put method (using the express-validator library)
-*/
