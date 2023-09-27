@@ -1,13 +1,13 @@
 import { Request, Response } from "express";
 import { validationResult, Result, ValidationError } from "express-validator";
 
-import Book, { TBook } from "../models/book.js";
+import { Book } from "../models";
 import checkValidationResult from "../util/checkValidationError.js";
 
 // GET /books --> Get All books
 export function getIndex(req: Request, res: Response) {
   Book.findAll()
-    .then((books: Array<TBook>) => {
+    .then((books) => {
       console.log("Successfully retrieved All books");
       res.status(200).json({ message: "Operation Success", data: books });
     })
@@ -48,7 +48,7 @@ export function postIndex(req: Request, res: Response) {
 
 // GET /books/:bookId --> Get a book by id
 export function getBook(req: Request, res: Response) {
-  const bookId: Number = req.params.bookId;
+  const bookId: number = req.params.bookId;
   const errors: Result<ValidationError> = validationResult(req);
   const checkError = checkValidationResult(errors);
 
@@ -57,7 +57,7 @@ export function getBook(req: Request, res: Response) {
   }
 
   Book.findByPk(bookId)
-    .then((book: TBook) => {
+    .then((book) => {
       if (book) {
         console.log("Successfully Fetched Book");
         res.status(200).json({ message: "Operation Success", data: book });
@@ -74,8 +74,8 @@ export function getBook(req: Request, res: Response) {
 
 // PUT /books/:bookId --> Update Book by id
 export function putUpdateBook(req: Request, res: Response) {
-  const updatedBook: TBook = req.body;
-  const bookId: Number = req.params.bookId;
+  const updatedBook = req.body;
+  const bookId: number = req.params.bookId;
   const errors: Result<ValidationError> = validationResult(req);
   const checkError = checkValidationResult(errors);
 
@@ -108,7 +108,7 @@ export function putUpdateBook(req: Request, res: Response) {
 
 // DELETE /books/:bookId --> Delete Book by id
 export function deleteBook(req: Request, res: Response) {
-  const bookId: Number = req.params.bookId;
+  const bookId: number = req.params.bookId;
 
   const errors: Result<ValidationError> = validationResult(req);
   const checkError = checkValidationResult(errors);
@@ -170,7 +170,7 @@ export function searchBooks(req: Request, res: Response) {
       throw new Error("Search query is missing");
     }
     Book.findAll()
-      .then((books: Array<TBook>) => {
+      .then((books) => {
         const filteredBooks = books.filter((book) => {
           return book.name.toLowerCase().includes(searchQuery.toLowerCase());
         });

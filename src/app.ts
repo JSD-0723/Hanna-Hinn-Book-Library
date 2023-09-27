@@ -7,6 +7,14 @@ import bookRoutes from "./routes/book.routes.js";
 import sequelize from "./util/database.js";
 import { get404 } from "./controllers/error.js";
 import { errorMiddleware } from "./middlewares/errorMiddleware.js";
+import {
+  User,
+  Book,
+  Category,
+  RentedBook,
+  BookAuthor,
+  Author,
+} from "./models/index.js";
 
 // Initializing the Express Application
 const app: Express = express();
@@ -23,8 +31,19 @@ app.use(get404);
 // Error handling middleware
 app.use(errorMiddleware);
 
+//defining Database Associations'
+// M - M between Author and Book
+Book.belongsToMany(Author, { through: BookAuthor });
+Author.belongsToMany(Book, { through: BookAuthor });
+// 1 - M between Category and Book
+Category.hasMany(Book);
+Book.belongsTo(Category);
+// M - M between User and Book
+Book.belongsToMany(User, { through: RentedBook });
+User.belongsToMany(Book, { through: RentedBook });
+
 sequelize
-  .sync()
+  .sync({ force: true })
   .then(() => {
     app.listen(serverConfig.PORT, serverConfig.HOST);
     console.log(
