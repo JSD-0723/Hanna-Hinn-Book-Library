@@ -8,11 +8,19 @@ export const fetchAllBooksData = () => {
     })
       .then((books) => {
         console.log("Fetched all books data");
-        resolve(books);
+        resolve({
+          success: true,
+          message: "Book added successfully",
+          books: books,
+        });
       })
       .catch((err) => {
         console.log("Error while fetching books data", err.message);
-        resolve([]);
+        resolve({
+          success: false,
+          message: "Error while fetching books data",
+          books: [],
+        });
       });
   });
 };
@@ -23,11 +31,48 @@ export const fetchBooks = () => {
     Book.findAll()
       .then((books) => {
         console.log("Fetched all books data");
-        resolve(books);
+        resolve({
+          success: true,
+          message: "Book added successfully",
+          books: books,
+        });
       })
       .catch((err) => {
         console.log("Error while fetching books data", err.message);
-        resolve([]);
+        resolve({
+          success: false,
+          message: "Error while fetching books data",
+          books: [],
+        });
+      });
+  });
+};
+
+// Fetch One Book based on tge id
+export const fetchBookById = (id: number) => {
+  return new Promise((resolve) => {
+    Book.findByPk(id)
+      .then((book) => {
+        if (!book) {
+          return resolve({
+            success: false,
+            message: "Book not found",
+            books: {},
+          });
+        } else {
+          return resolve({
+            success: true,
+            message: "Book fetched Successfully",
+            book: book,
+          });
+        }
+      })
+      .catch((err) => {
+        resolve({
+          success: false,
+          message: "Error adding Book",
+          error: err,
+        });
       });
   });
 };
@@ -76,6 +121,37 @@ export const createBook = (
           success: false,
           message: "Error adding Book",
           error: err,
+        });
+      });
+  });
+};
+
+export const deleteBookById = (id: number) => {
+  return new Promise((resolve) => {
+    Book.findByPk(id)
+      .then((book) => {
+        if (!book) {
+          console.log("Requested Book does not exists: ");
+          resolve({
+            success: false,
+            message: "Requested Book does not exist",
+          });
+        }
+        return book.destroy();
+      })
+      .then((result) => {
+        console.log("Delete product successfully");
+        return resolve({
+          success: true,
+          message: "Delete product successfully",
+          result: result,
+        });
+      })
+      .catch((error: Error) => {
+        resolve({
+          success: false,
+          message: "Error adding Book",
+          error: error,
         });
       });
   });

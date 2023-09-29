@@ -1,7 +1,12 @@
 import { Request, Response } from "express";
 import { validationResult, Result, ValidationError } from "express-validator";
 
-import { fetchAllBooksData, createBook } from "../services/bookService";
+import {
+  fetchAllBooksData,
+  createBook,
+  fetchBookById,
+  deleteBookById,
+} from "../services/bookService";
 import checkValidationResult from "../util/checkValidationError";
 
 // GET /books --> Get All books
@@ -27,20 +32,6 @@ export function postIndex(req: Request, res: Response) {
   createBook(name, authorId, isbn, categoryId).then((message) => {
     res.json(message);
   });
-
-  // Book.create({
-  //   name: name,
-  //   author: author,
-  //   isbn: isbn,
-  // })
-  //   .then(() => {
-  //     console.log("Successfully Added Book:");
-  //     res.status(201).json({ message: "Book added successfully" });
-  //   })
-  //   .catch((error: Error) => {
-  //     console.log("Error occurred when adding book:", error.message);
-  //     res.status(500).json({ error: error.message || "Error creating Book!" });
-  //   });
 }
 
 // GET /books/:bookId --> Get a book by id
@@ -53,20 +44,9 @@ export function getBook(req: Request, res: Response) {
     return res.status(422).json(checkError);
   }
 
-  // Book.findByPk(bookId)
-  //   .then((book) => {
-  //     if (book) {
-  //       console.log("Successfully Fetched Book");
-  //       res.status(200).json({ message: "Operation Success", data: book });
-  //     } else {
-  //       console.log("Requested Book Does not Exists: ", book);
-  //       res.status(404).json({ message: "Book not found" });
-  //     }
-  //   })
-  //   .catch((error: Error) => {
-  //     console.log("Failure Fetching Book: ", error.message);
-  //     res.status(500).json({ error: error.message || "Error Fetching Book" });
-  //   });
+  fetchBookById(bookId).then((result) => {
+    return res.json(result);
+  });
 }
 
 // PUT /books/:bookId --> Update Book by id
@@ -114,23 +94,9 @@ export function deleteBook(req: Request, res: Response) {
     return res.status(422).json(checkError);
   }
 
-  // Book.findByPk(bookId)
-  //   .then((book) => {
-  //     if (!book) {
-  //       console.log("Requested Book does not exists: ");
-  //       return res.status(404).json({ message: "Book not found!" });
-  //     }
-  //     return book.destroy();
-  //   })
-  //   .then((result) => {
-  //     console.log("Delete product successfully");
-  //     return res.status(200).json({ message: "Book Deleted successfully" });
-  //   })
-  //   .catch((error: Error) => {
-  //     res.status(500).json({
-  //       error: error.message || "Error Occurred While Deleting Book!",
-  //     });
-  //   });
+  deleteBookById(bookId).then((result) => {
+    return res.json(result);
+  });
 }
 
 // POST /rent-book --> Rent a Book

@@ -25,7 +25,7 @@ router.get("", getIndex);
 router.post(
   "",
   passport.authenticate("jwt", { session: false }),
-  // checkBookData,
+  checkBookData,
   postIndex
 );
 
