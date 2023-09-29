@@ -1,5 +1,5 @@
-import { Result, ValidationError } from "express-validator";
-
+// Helper Function for Checking the validation status
+// Returns an error message if errors are encountered
 const checkValidationResult = (errors) => {
   if (!errors.isEmpty()) {
     let errorsMessage = "";

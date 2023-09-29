@@ -1,9 +1,11 @@
+// Imports
 import { hashSync, compareSync } from "bcrypt";
 import jwt from "jsonwebtoken";
 
 import { User } from "../models";
 import { jwtKey } from "../config/secretKeys.config";
 
+// User Registration logic
 export const userRegister = (newUser: User) => {
   return new Promise<Object>((resolve) => {
     User.create({
@@ -35,6 +37,7 @@ export const userRegister = (newUser: User) => {
   });
 };
 
+// User Login logic
 export const userLogin = (email, password) => {
   return new Promise<any>((resolve) => {
     User.findOne({ where: { email: email } }).then((user) => {

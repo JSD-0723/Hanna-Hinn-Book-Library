@@ -14,9 +14,9 @@ export function getIndex(req: Request, res: Response) {
 // POST /books --> create a new book
 export function postIndex(req: Request, res: Response) {
   const name: String = req.body.name; // book
-  const authorId: Number = req.body.author; // author name
+  const authorId: Number = req.body.authorId; // author name
   const isbn: Number = req.body.isbn; // isbn
-  const category: String = req.body.category; // category name
+  const categoryId: Number = req.body.categoryId; // category name
   const errors: Result<ValidationError> = validationResult(req);
   const checkError = checkValidationResult(errors);
 
@@ -24,18 +24,8 @@ export function postIndex(req: Request, res: Response) {
     return res.status(422).json(checkError);
   }
 
-  const newBook = {
-    name: name,
-    authorId: authorId,
-    isbn: isbn,
-    category: category,
-  };
-  createBook(newBook).then((status) => {
-    if (status) {
-      res.status(200).json({ result: "Book Added Successfully" });
-    } else {
-      res.status(500).json({ result: "Book Creation Failed" });
-    }
+  createBook(name, authorId, isbn, categoryId).then((message) => {
+    res.json(message);
   });
 
   // Book.create({

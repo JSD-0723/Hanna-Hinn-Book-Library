@@ -33,29 +33,50 @@ export const fetchBooks = () => {
 };
 
 // Create Book
-export const createBook = (newBookData) => {
-  const { name, authorId, isbn, category } = newBookData;
-
+export const createBook = (
+  name: String,
+  authorId: Number,
+  isbn: Number,
+  categoryId: Number
+) => {
+  console.log("Creating Book", name, authorId, isbn, categoryId);
   return new Promise((resolve) => {
-    // Author.findOne({ where: { id: authorId } }).then((authors) => {
-    //   console.log("Authors", authors);
-    //   Category.findOne({ where: { type: category } }).then((category) => {
-    //     console.log(category);
-    //     Book.create({
-    //       name: name,
-    //       isbn: isbn,
-    //       Category: category,
-    //       Authors: authors,
-    //     })
-    //       .then((result) => {
-    //         console.log("Book Successfully Added", result);
-    //         resolve(true);
-    //       })
-    //       .catch((err) => {
-    //         console.log("Book Creation Failed", err.message);
-    //         resolve(false);
-    //       });
-    //   });
-    // });
+    Book.create({
+      name: name,
+      isbn: isbn,
+    })
+      .then((book) => {
+        Author.findAll({ where: { id: authorId } }).then((author) => {
+          if (!author) {
+            return resolve({
+              success: false,
+              message: "Author Id not valid",
+            });
+          }
+          book.addAuthors(author);
+          Category.findOne({ where: { id: categoryId } }).then((category) => {
+            if (!category) {
+              return resolve({
+                success: false,
+                message: "Category Id not valid",
+              });
+            } else {
+              book.setCategory(category);
+              return resolve({
+                success: true,
+                message: "Book added successfully",
+                book: book,
+              });
+            }
+          });
+        });
+      })
+      .catch((err) => {
+        resolve({
+          success: false,
+          message: "Error adding Book",
+          error: err,
+        });
+      });
   });
 };

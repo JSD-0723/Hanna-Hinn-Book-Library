@@ -1,6 +1,6 @@
 import express, { Express } from "express";
+import passport from "passport";
 
-import { authenticateJWT } from "../middlewares/authentication";
 import { postRegister, postLogin, getProtected } from "../controllers/auth";
 import {
   registerValidations,
@@ -9,10 +9,12 @@ import {
 
 const router: Express = express.Router();
 
+// Authentication Routes
+
 router.post("/register", registerValidations, postRegister);
 
 router.post("/login", loginValidations, postLogin);
 
-router.get("/protected", authenticateJWT, getProtected);
+router.get("/protected", passport.authenticate("jwt", { session: false }), getProtected);
 
 export default router;

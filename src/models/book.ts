@@ -2,6 +2,7 @@ import Sequelize from "sequelize";
 import sequelize from "../util/database";
 
 class Book extends Sequelize.Model {
+  [x: string]: any;
   declare id: number;
   declare name: string;
   declare isbn: string;
