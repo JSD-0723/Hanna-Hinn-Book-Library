@@ -1,8 +1,8 @@
-import User from "./user.js";
-import Author from "./author.js";
-import BookAuthor from "./book_author.js";
-import Book from "./book.js";
-import Category from "./category.js";
-import RentedBook from "./rented_book.js";
+import User from "./user";
+import Author from "./author";
+import BookAuthor from "./book_author";
+import Book from "./book";
+import Category from "./category";
+import RentedBook from "./rented_book";
 
 export { User, Book, Category, RentedBook, BookAuthor, Author };

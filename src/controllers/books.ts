@@ -1,29 +1,22 @@
 import { Request, Response } from "express";
 import { validationResult, Result, ValidationError } from "express-validator";
 
-import { Book } from "../models";
-import checkValidationResult from "../util/checkValidationError.js";
+import { fetchAllBooksData, createBook } from "../services/bookService";
+import checkValidationResult from "../util/checkValidationError";
 
 // GET /books --> Get All books
 export function getIndex(req: Request, res: Response) {
-  Book.findAll()
-    .then((books) => {
-      console.log("Successfully retrieved All books");
-      res.status(200).json({ message: "Operation Success", data: books });
-    })
-    .catch((error: Error) => {
-      console.log("Error occurred when fetching books:", error.message);
-      res
-        .status(500)
-        .json({ error: error.message || "Error Fetching All Books" });
-    });
+  fetchAllBooksData().then((books) => {
+    res.json({ result: books });
+  });
 }
 
 // POST /books --> create a new book
 export function postIndex(req: Request, res: Response) {
-  const name: String = req.body.name;
-  const author: String = req.body.author;
-  const isbn: Number = req.body.isbn;
+  const name: String = req.body.name; // book
+  const authorId: Number = req.body.author; // author name
+  const isbn: Number = req.body.isbn; // isbn
+  const category: String = req.body.category; // category name
   const errors: Result<ValidationError> = validationResult(req);
   const checkError = checkValidationResult(errors);
 
@@ -31,19 +24,33 @@ export function postIndex(req: Request, res: Response) {
     return res.status(422).json(checkError);
   }
 
-  Book.create({
+  const newBook = {
     name: name,
-    author: author,
+    authorId: authorId,
     isbn: isbn,
-  })
-    .then(() => {
-      console.log("Successfully Added Book:");
-      res.status(201).json({ message: "Book added successfully" });
-    })
-    .catch((error: Error) => {
-      console.log("Error occurred when adding book:", error.message);
-      res.status(500).json({ error: error.message || "Error creating Book!" });
-    });
+    category: category,
+  };
+  createBook(newBook).then((status) => {
+    if (status) {
+      res.status(200).json({ result: "Book Added Successfully" });
+    } else {
+      res.status(500).json({ result: "Book Creation Failed" });
+    }
+  });
+
+  // Book.create({
+  //   name: name,
+  //   author: author,
+  //   isbn: isbn,
+  // })
+  //   .then(() => {
+  //     console.log("Successfully Added Book:");
+  //     res.status(201).json({ message: "Book added successfully" });
+  //   })
+  //   .catch((error: Error) => {
+  //     console.log("Error occurred when adding book:", error.message);
+  //     res.status(500).json({ error: error.message || "Error creating Book!" });
+  //   });
 }
 
 // GET /books/:bookId --> Get a book by id
@@ -56,20 +63,20 @@ export function getBook(req: Request, res: Response) {
     return res.status(422).json(checkError);
   }
 
-  Book.findByPk(bookId)
-    .then((book) => {
-      if (book) {
-        console.log("Successfully Fetched Book");
-        res.status(200).json({ message: "Operation Success", data: book });
-      } else {
-        console.log("Requested Book Does not Exists: ", book);
-        res.status(404).json({ message: "Book not found" });
-      }
-    })
-    .catch((error: Error) => {
-      console.log("Failure Fetching Book: ", error.message);
-      res.status(500).json({ error: error.message || "Error Fetching Book" });
-    });
+  // Book.findByPk(bookId)
+  //   .then((book) => {
+  //     if (book) {
+  //       console.log("Successfully Fetched Book");
+  //       res.status(200).json({ message: "Operation Success", data: book });
+  //     } else {
+  //       console.log("Requested Book Does not Exists: ", book);
+  //       res.status(404).json({ message: "Book not found" });
+  //     }
+  //   })
+  //   .catch((error: Error) => {
+  //     console.log("Failure Fetching Book: ", error.message);
+  //     res.status(500).json({ error: error.message || "Error Fetching Book" });
+  //   });
 }
 
 // PUT /books/:bookId --> Update Book by id
@@ -88,22 +95,22 @@ export function putUpdateBook(req: Request, res: Response) {
     return res.status(422).json({ message: "Request Body is not Valid" });
   }
 
-  Book.findByPk(bookId)
-    .then((book) => {
-      if (!book) {
-        console.log("Request Book does not exists");
-        return res.status(404).json({ message: "Book not found!" });
-      } else {
-        Book.update(updatedBook, { where: { id: bookId } }).then(() => {
-          console.log("Successfully updated Book!");
-          res.status(200).json({ message: "Book updated successfully" });
-        });
-      }
-    })
-    .catch((error: Error) => {
-      console.log("Failure Updating Book: ", error.message);
-      res.status(500).json({ error: error.message || "Error updating Book!" });
-    });
+  // Book.findByPk(bookId)
+  //   .then((book) => {
+  //     if (!book) {
+  //       console.log("Request Book does not exists");
+  //       return res.status(404).json({ message: "Book not found!" });
+  //     } else {
+  //       Book.update(updatedBook, { where: { id: bookId } }).then(() => {
+  //         console.log("Successfully updated Book!");
+  //         res.status(200).json({ message: "Book updated successfully" });
+  //       });
+  //     }
+  //   })
+  //   .catch((error: Error) => {
+  //     console.log("Failure Updating Book: ", error.message);
+  //     res.status(500).json({ error: error.message || "Error updating Book!" });
+  //   });
 }
 
 // DELETE /books/:bookId --> Delete Book by id
@@ -117,23 +124,23 @@ export function deleteBook(req: Request, res: Response) {
     return res.status(422).json(checkError);
   }
 
-  Book.findByPk(bookId)
-    .then((book) => {
-      if (!book) {
-        console.log("Requested Book does not exists: ");
-        return res.status(404).json({ message: "Book not found!" });
-      }
-      return book.destroy();
-    })
-    .then((result) => {
-      console.log("Delete product successfully");
-      return res.status(200).json({ message: "Book Deleted successfully" });
-    })
-    .catch((error: Error) => {
-      res.status(500).json({
-        error: error.message || "Error Occurred While Deleting Book!",
-      });
-    });
+  // Book.findByPk(bookId)
+  //   .then((book) => {
+  //     if (!book) {
+  //       console.log("Requested Book does not exists: ");
+  //       return res.status(404).json({ message: "Book not found!" });
+  //     }
+  //     return book.destroy();
+  //   })
+  //   .then((result) => {
+  //     console.log("Delete product successfully");
+  //     return res.status(200).json({ message: "Book Deleted successfully" });
+  //   })
+  //   .catch((error: Error) => {
+  //     res.status(500).json({
+  //       error: error.message || "Error Occurred While Deleting Book!",
+  //     });
+  //   });
 }
 
 // POST /rent-book --> Rent a Book
@@ -169,22 +176,22 @@ export function searchBooks(req: Request, res: Response) {
     if (!searchQuery) {
       throw new Error("Search query is missing");
     }
-    Book.findAll()
-      .then((books) => {
-        const filteredBooks = books.filter((book) => {
-          return book.name.toLowerCase().includes(searchQuery.toLowerCase());
-        });
-        console.log(`Successfully Searched ${searchQuery}: `, filteredBooks);
-        res
-          .status(200)
-          .json({ message: "Operation Success", data: filteredBooks });
-      })
-      .catch((error: Error) => {
-        console.log("Failure Searching Books: ", error.message);
-        res
-          .status(500)
-          .json({ error: error.message || "Error Fetching All Books" });
-      });
+    // Book.findAll()
+    //   .then((books) => {
+    //     const filteredBooks = books.filter((book) => {
+    //       return book.name.toLowerCase().includes(searchQuery.toLowerCase());
+    //     });
+    //     console.log(`Successfully Searched ${searchQuery}: `, filteredBooks);
+    //     res
+    //       .status(200)
+    //       .json({ message: "Operation Success", data: filteredBooks });
+    //   })
+    //   .catch((error: Error) => {
+    //     console.log("Failure Searching Books: ", error.message);
+    //     res
+    //       .status(500)
+    //       .json({ error: error.message || "Error Fetching All Books" });
+    //   });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

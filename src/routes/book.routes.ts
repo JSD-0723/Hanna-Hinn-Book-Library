@@ -4,7 +4,7 @@ import {
   checkBookData,
   checkBookId,
   checkPutBookData,
-} from "../middlewares/bookValidationMiddlewares.js";
+} from "../middlewares/bookValidation";
 
 import {
   getIndex,
@@ -13,7 +13,7 @@ import {
   postIndex,
   deleteBook,
   searchBooks,
-} from "../controllers/books.js";
+} from "../controllers/books";
 
 const router: Express = express.Router();
 
