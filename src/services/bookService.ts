@@ -10,7 +10,7 @@ export const fetchAllBooksData = () => {
         console.log("Fetched all books data");
         resolve({
           success: true,
-          message: "Book added successfully",
+          message: "Book fetched ssuccessfully",
           books: books,
         });
       })
@@ -33,7 +33,7 @@ export const fetchBooks = () => {
         console.log("Fetched all books data");
         resolve({
           success: true,
-          message: "Book added successfully",
+          message: "Book fetched successfully",
           books: books,
         });
       })
@@ -156,3 +156,5 @@ export const deleteBookById = (id: number) => {
       });
   });
 };
+
+export const rentBookById = () => {};

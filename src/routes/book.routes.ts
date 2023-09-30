@@ -14,6 +14,7 @@ import {
   postIndex,
   deleteBook,
   searchBooks,
+  postRentBook,
 } from "../controllers/books";
 
 const router: Express = express.Router();
@@ -47,6 +48,8 @@ router.delete(
   checkBookId,
   deleteBook
 );
+
+router.post("/rent/:bookId", postRentBook);
 
 // router.post("/rent", rentBook);
 

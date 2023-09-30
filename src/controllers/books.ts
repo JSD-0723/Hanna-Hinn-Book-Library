@@ -1,5 +1,9 @@
 import { Request, Response } from "express";
 import { validationResult, Result, ValidationError } from "express-validator";
+import { Strategy as JwtStrategy, ExtractJwt } from "passport-jwt";
+
+import { User, Book } from "../models";
+import { jwtKey } from "../config/secretKeys.config";
 
 import {
   fetchAllBooksData,
@@ -64,23 +68,6 @@ export function putUpdateBook(req: Request, res: Response) {
     console.log("Request body is not Valid: ", updatedBook);
     return res.status(422).json({ message: "Request Body is not Valid" });
   }
-
-  // Book.findByPk(bookId)
-  //   .then((book) => {
-  //     if (!book) {
-  //       console.log("Request Book does not exists");
-  //       return res.status(404).json({ message: "Book not found!" });
-  //     } else {
-  //       Book.update(updatedBook, { where: { id: bookId } }).then(() => {
-  //         console.log("Successfully updated Book!");
-  //         res.status(200).json({ message: "Book updated successfully" });
-  //       });
-  //     }
-  //   })
-  //   .catch((error: Error) => {
-  //     console.log("Failure Updating Book: ", error.message);
-  //     res.status(500).json({ error: error.message || "Error updating Book!" });
-  //   });
 }
 
 // DELETE /books/:bookId --> Delete Book by id
@@ -99,31 +86,56 @@ export function deleteBook(req: Request, res: Response) {
   });
 }
 
-// POST /rent-book --> Rent a Book
-// export function rentBook(req: Request, res: Response) {
-//   try {
-//     const bookName: string = req.body.name;
-//     if (!bookName) {
-//       throw new Error("Book name missing for rent");
-//     }
-//     Book.findAll().then((books) => {
-//       let foundBook: boolean = false;
-//       books.forEach((book) => {
-//         if (book.name.toLowerCase() === bookName.toLowerCase()) {
-//           book.rented = true;
-//           foundBook = true;
-//         }
-//       });
-//       if (foundBook) {
-//         res.status(200).send("Book Rented Successfully");
-//       } else {
-//         res.status(404).send("Desired book not found");
-//       }
-//     });
-//   } catch (error) {
-//     res.status(500).json({ error: error.message });
-//   }
-// }
+// todo: check another way to add the startDate and endDate to the Rent_Book table
+// POST /rent/:bookId
+export const postRentBook = (req: Request, res: Response) => {
+  const bookId = req.params.bookId;
+  const startDate = req.body.startDate;
+  const endDate = req.body.endDate;
+
+  let opts = {
+    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+    secretOrKey: jwtKey,
+  };
+  const jwtStrategy = new JwtStrategy(opts, (jwt_payload) => {
+    User.findOne({ where: { id: jwt_payload.id } })
+      .then((user: any) => {
+        if (user) {
+          console.log("Valid JWT Payload");
+          Book.findByPk(bookId).then((book) => {
+            if (!book) {
+              return res.status(404).json({
+                success: false,
+                message: "Request Book Not Found",
+              });
+            } else {
+              user.addBook(book);
+              return res.json({
+                success: true,
+                message: "Book Rented successfully",
+                user: user,
+                book: book,
+              });
+            }
+          });
+        } else {
+          console.log("inValid JWT Payload");
+          return res.status(401).message({
+            success: false,
+            message: "UnAuthorized User",
+          });
+        }
+      })
+      .catch((err) => {
+        console.log("Error occurred while checking JWT payload", err.message);
+        return res.status(401).message({
+          success: false,
+          message: "Something went wrong",
+          error: err,
+        });
+      });
+  });
+};
 
 // GET /search?search="str" --> Get books that match the search
 export function searchBooks(req: Request, res: Response) {
